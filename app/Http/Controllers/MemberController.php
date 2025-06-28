@@ -80,9 +80,16 @@ class MemberController extends Controller
      */
     public function update(Request $request, Member $member)
     {
+        // Prepend +92 to the phone input if not already present
+        $input = $request->all();
+        if (!str_starts_with($input['phone'], '+92')) {
+            $input['phone'] = '+92' . ltrim($input['phone'], '0');
+        }
+        $request->merge(['phone' => $input['phone']]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => ['required', 'regex:/^\+92\d{10}$/'],
+            'phone' => ['required', 'regex:/^\\+92\\d{10}$/'],
             'membership_start' => 'required|date',
             'membership_end' => 'required|date|after_or_equal:membership_start',
             'amount_paid' => 'required|numeric|min:0',
